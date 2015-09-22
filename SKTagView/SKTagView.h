@@ -8,6 +8,11 @@
 #import <UIKit/UIKit.h>
 #import "SKTag.h"
 
+typedef enum : NSUInteger {
+    SKTagAlignmentLeft,
+    SKTagAlignmentJustify,
+} SKTagAlignment;
+
 @interface SKTagView : UIView
 
 @property (nonatomic) UIEdgeInsets padding;
@@ -15,12 +20,14 @@
 @property (nonatomic) CGFloat insets;
 @property (nonatomic) CGFloat preferredMaxLayoutWidth;
 @property (nonatomic) BOOL singleLine;
+@property (nonatomic) SKTagAlignment alignment;
 
 - (void)addTag:(SKTag *)tag;
 - (void)insertTag:(SKTag *)tag atIndex:(NSUInteger)index;
 - (void)removeTag:(SKTag *)tag;
 - (void)removeTagAtIndex:(NSUInteger)index;
 - (void)removeAllTags;
+- (void)blinkTagAtIndex:(NSUInteger)index withCompletion:(void (^)(void))completion;
 
 @property (nonatomic, copy) void (^didClickTagAtIndex)(NSUInteger index);
 

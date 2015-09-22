@@ -19,6 +19,43 @@
 
 @implementation SKTagView
 
+#pragma mark - Init
+
+- (instancetype)init
+{
+    self = [super init];
+    if (self)
+    {
+        [self setDefaults];
+    }
+    return self;
+}
+
+- (instancetype)initWithCoder:(NSCoder *)coder
+{
+    self = [super initWithCoder:coder];
+    if (self)
+    {
+        [self setDefaults];
+    }
+    return self;
+}
+
+- (instancetype)initWithFrame:(CGRect)frame
+{
+    self = [super initWithFrame:frame];
+    if (self)
+    {
+        [self setDefaults];
+    }
+    return self;
+}
+
+- (void)setDefaults
+{
+    _alignment = SKTagAlignmentLeft;
+}
+
 #pragma mark - Life circle
 - (void)updateConstraints
 {
@@ -44,6 +81,7 @@
     CGFloat currentX = leftOffset;
     CGFloat intrinsicHeight = topPadding;
     CGFloat intrinsicWidth = leftOffset;
+    SKTagAlignment alignment = self.alignment;
     
     if (!self.singleLine && self.preferredMaxLayoutWidth > 0)
     {
@@ -78,7 +116,7 @@
                 currentX += size.width;
             }
             previewsView = view;
-            intrinsicWidth = MAX(intrinsicWidth, currentX + rightOffset);
+            intrinsicWidth = (alignment == SKTagAlignmentLeft) ? MAX(intrinsicWidth, currentX + rightOffset) : self.preferredMaxLayoutWidth;
         }
         
         intrinsicHeight += bottomOffset + itemVerticalMargin * (lineCount - 1);
@@ -146,6 +184,7 @@
     CGFloat topPadding = self.padding.top;
     CGFloat itemVerticalMargin = self.lineSpace;
     CGFloat currentX = leftOffset;
+    SKTagAlignment alignment = self.alignment;
     
     if (!self.singleLine && self.preferredMaxLayoutWidth > 0)
     {
@@ -179,6 +218,13 @@
                         SAVE_C(make.leading.equalTo(superView.mas_leading).with.offset(leftOffset));
                     }];
                     currentX = leftOffset + size.width;
+                    
+                    if(alignment == SKTagAlignmentJustify)
+                    {
+                        [previewsView mas_updateConstraints:^(MASConstraintMaker *make) {
+                            SAVE_C(make.trailing.equalTo(superView.mas_trailing).with.offset(rightOffset));
+                        }];
+                    }
                 }
             }
             else
@@ -336,6 +382,20 @@
     
     self.didSetup = NO;
     [self invalidateIntrinsicContentSize];
+}
+
+- (void)blinkTagAtIndex:(NSUInteger)index withCompletion:(void (^)(void))completion
+{
+    if(index >= self.tags.count) return;
+    
+    UIView *view = self.subviews[index];
+    
+    [UIView animateWithDuration:0.15 delay:0.0 options:UIViewAnimationOptionAutoreverse|UIViewAnimationOptionRepeat animations:^{
+        [UIView setAnimationRepeatCount:3];
+        view.alpha = 0.2;
+    } completion:^(BOOL finished) {
+        if(completion) completion();
+    }];
 }
 
 @end
